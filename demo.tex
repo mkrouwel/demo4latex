@@ -1,0 +1,58 @@
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric,decorations.markings,positioning,arrows}%arrows.meta,,
+
+\def\actsize{3em}
+\def\actorsize{8em}
+\def\transsize{6em}
+
+\tikzset{
+    position/.style args={#1:#2 from #3}{
+        at=(#3.#1), anchor=#1+180, shift=(#1:#2)
+    }
+}
+
+%for multi-line texts
+\newcommand{\mnode}[1]{\begin{tabular}{c}#1\end{tabular}}
+
+%environment for drawing demo models, based on tikz <scale (def = 1), text size>
+\newenvironment{demo}[2][1]{
+	\begin{tikzpicture}[
+		scale=#1,>=latex, every node/.append style={transform shape},
+		%square/.style={regular polygon, regular polygon sides=4, minimum size=6em},
+		fact/.style={circle, draw, minimum size=\actsize},
+		act/.style={rectangle, draw, minimum size=\actsize},
+		disc/.style={fact, double},
+		trans/.style={circle,draw,fill=white,minimum size=\transsize,font=#2},
+		prod/.style={diamond,draw,minimum size=\transsize,font=#2},
+		ar/.style={rectangle,draw,minimum size=\actorsize,font=#2},
+		decoration={markings,mark=at position 0 with {\fill (-.2em,-.2em) rectangle (.2em,.2em);}},
+	]}{
+	\end{tikzpicture}}
+
+%draw actor role <label to refer to, position, label as shown (can be multi-line)>
+\newcommand{\demoas}[3]{\node[ar] (#1) [#2] {\mnode{#3}};}
+%draw actor role <size of label (default = normalsize), label to refer to, position, label as shown (can be multi-line)>
+\newcommand{\demots}[3]{
+	\node[trans] (#1) [#2] {\mnode{#3}};
+	\node[prod] (#1) [#2] {};
+}
+%draw fact bank <label to refer to, position (do not use xshift!), label as shown>
+\newcommand{\demofbs}[3]{
+	\node[trans] [#2,xshift=.4em] {};
+	\demots{#1}{#2}{#3}
+}
+%draw actor role <ransaction label to refer to, actor label to refer to, position (do not use yshift!), transaction label as shown (can be multi-line), actor label as shown (can be multi-line)>
+\newcommand{\demotas}[5]{
+	\demoas{#2}{#3, yshift=-3em}{\\#5}
+	\demots{#1}{#3}{#4}
+}
+%draw self-initiating actor role <transaction label to refer to, actor label to refer to, position (do not use yshift!), transaction label as shown (can be multi-line), actor label as shown (can be multi-line)>
+\newcommand{\demosis}[5]{
+	\demoas{#2}{#3}{#5}
+	\demots{#1}{#3}{#4}
+}
+%draw initiation link from actor role symbol to transaction kind symbol
+\newcommand{\demoil}[2]{\draw[-] (#1) -- (#2);}
+%draw executor link from actor role symbol to transaction kind symbol
+\newcommand{\demoel}[2]{\draw[postaction={decorate}] (#1) -- (#2);}
+
